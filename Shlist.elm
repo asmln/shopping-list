@@ -206,11 +206,11 @@ onEnter msg =
     let
         isEnter code =
             if code == 13 then
-                Json.succeed msg
+                Decode.succeed msg
             else
-                Json.fail "not ENTER"
+                Decode.fail "not ENTER"
     in
-        on "keydown" (Json.andThen isEnter keyCode)
+        on "keydown" (Decode.andThen isEnter keyCode)
         
 viewItems : List Item -> Html Msg
 viewItems items =
