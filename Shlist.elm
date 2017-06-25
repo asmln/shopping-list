@@ -12,11 +12,12 @@ import Html exposing (..)
 import String
 import Task
 
+main : Program (Maybe Model) Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { init = init
         , view = view
-        , update = update
+        , update = updateWithStorage
         , subscriptions = \_ -> Sub.none
         }
 
