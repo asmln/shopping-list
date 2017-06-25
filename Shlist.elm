@@ -19,12 +19,12 @@ main =
 type alias Model =
   { xchangeName : String
   , xchangeUrl : String
-  , xchangeRate : String
+  , xchangeRate : Float
   }
 
 init : (Model, Cmd Msg)
 init =
-  (Model "USDRUB" "https://query.yahooapis.com/v1/public/yql?q=select * from csv where url='http://finance.yahoo.com/d/quotes.csv?e=.csv&f=nl1d1t1&s=${xName}=X';&format=json&callback=" "1", Cmd.none)
+  (Model "USDRUB" "https://query.yahooapis.com/v1/public/yql?q=select * from csv where url='http://finance.yahoo.com/d/quotes.csv?e=.csv&f=nl1d1t1&s=${xName}=X';&format=json&callback=" 0, Cmd.none)
 
 -- UPDATE
 
@@ -55,9 +55,10 @@ getXchangeRate xName xUrl =
   in
     Http.send XchRate request
 
-decodeX : Decode.Decoder String
-decodeX =
-  Decode.at ["query", "results", "row", "col1"] Decode.string
+decodeX : Decode.Decoder Float
+decodeX = case (parseFloat (Decode.at ["query", "results", "row", "col1"] Decode.string)) of
+    Just n -> n
+    Nothing -> 0
 
 -- SUBSCRIPTIONS
 
@@ -72,6 +73,6 @@ view : Model -> Html Msg
 view model =
     div []
         [ h2 [] [ text model.xchangeName ]
-        , h3 [] [ text model.xchangeRate ]
+        , h3 [] [ text (toString model.xchangeRate) ]
         , button [ onClick ShowXchRate ] [ text "Test!" ]
         ]
