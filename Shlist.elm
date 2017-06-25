@@ -256,7 +256,7 @@ viewItem item =
         ]
         
 viewControls : String -> List Item -> Html Msg
-viewControls visibility entries =
+viewControls items =
     footer
         [ class "footer"
         , hidden (List.isEmpty items)
