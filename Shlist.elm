@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy, lazy2)
+import Html.Lazy exposing (lazy)
 import Http
 import Json.Decode as Decode
 import Dom
@@ -178,8 +178,8 @@ view model =
         [ section
             [ class "shlist" ]
             [ lazy viewInput model.itemName
-            , lazy2 viewItems model.items
-            , lazy2 viewControls model.items
+            , lazy viewItems model.items
+            , lazy viewControls model.items
             ]
         , infoFooter
         ]
