@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy)
+import Html.Lazy exposing (lazy, lazy2)
 import Http
 import Json.Decode as Decode
 import Dom
@@ -40,7 +40,6 @@ type alias Model =
     { uid : Int
     , items : List Item
     , itemName : String
-    , totalAmmount : Float    
     , xchangeName : String
     , xchangeUrl : String
     , xchangeRate : Float
@@ -58,17 +57,16 @@ originalModel =
     { uid = 0
     , items = []
     , itemName = ""
-    , totalAmmount = 0
-    , xchangeName = "USDRUB"
+    , xchangeName = "RUBUSD"
     , xchangeUrl = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20csv%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fd%2Fquotes.csv%3Fe%3D.csv%26f%3Dc4l1%26s%3D${xName}%3DX%22%3B&format=json&diagnostics=true&callback="
     , xchangeRate = 0
     }
     
-newItem : Int -> String -> Item
-newItem id name =
+newItem : Int -> String -> Float -> Item
+newItem id name price =
     { id = id
     , name = name
-    , price = 0
+    , price = price
     , editing = False
     }
 
@@ -102,7 +100,7 @@ update msg model =
                 , items = if String.isEmpty model.itemName then
                               model.items
                           else
-                              model.items ++ [ newItem model.uid model.itemName ]
+                              model.items ++ [ newItem model.uid model.itemName 0 ]
         } ! []
         
     UpdateItemName str ->
@@ -131,12 +129,10 @@ update msg model =
                 ! []
 
     Delete id ->
-        { model | items = List.filter (\i -> i.id /= id) model.items 
-                , totalAmmount = calcTotalAmount model } ! []
+        { model | items = List.filter (\i -> i.id /= id) model.items } ! []
 
     DeleteAll ->
-        { model | items = [] 
-                , totalAmmount = 0} ! []
+        { model | items = [] } ! []
         
     Buy id priceStr ->
         let
@@ -146,8 +142,7 @@ update msg model =
                 else
                     i
         in
-                { model | items = List.map updateItem model.items 
-                        , totalAmmount = calcTotalAmount model} ! []
+                { model | items = List.map updateItem model.items } ! []
   
     XchRate (Ok xRateStr) -> 
         let n = Result.withDefault 0 (String.toFloat xRateStr) 
@@ -157,9 +152,6 @@ update msg model =
     XchRate (Err _) ->
       model ! []
       
-calcTotalAmount : Model -> Float
-calcTotalAmount model = (List.sum (List.map (\i -> i.price) model.items)) * model.xchangeRate
-    
 getXchangeRate : String -> String -> Cmd Msg
 getXchangeRate xName xUrl =
   let
@@ -191,6 +183,7 @@ view model =
             [ lazy viewInput model.itemName
             , lazy viewItems model.items
             , lazy viewControls model.items
+            , lazy2 viewResult model.items model.xchangeRate
             ]
         , infoFooter
         ]
@@ -237,24 +230,30 @@ viewKeyedItem item =
     
 viewItem : Item -> Html Msg
 viewItem item =
-    li
-        [ classList [ ( "completed", item.price > 0 ), ( "editing", item.editing ) ] ]
-        [ div
-            [ class "view" ]
-            [ input
-                [ class "price"
-                , placeholder "RUB", onInput (Buy item.id)
+    let
+        originPriceArr = [ class "price", onInput (Buy item.id)]
+
+        priceArr = if item.price == 0 then 
+                       originPriceArr ++ [ placeholder "RUB" ]
+                   else
+                       originPriceArr ++ [ value (toString item.price) ]
+    in
+        li
+            [ classList [ ( "completed", item.price > 0 ), ( "editing", item.editing ) ] ]
+            [ div
+                [ class "view" ]
+                [ input
+                    priceArr
+                    []
+                , label
+                    [ onDoubleClick (EditingItem item.id True) ]
+                    [ text item.name ]
+                , button
+                    [ class "destroy"
+                    , onClick (Delete item.id)
+                    ]
+                    []
                 ]
-                []
-            , label
-                [ onDoubleClick (EditingItem item.id True) ]
-                [ text item.name ]
-            , button
-                [ class "destroy"
-                , onClick (Delete item.id)
-                ]
-                []
-            ]
         , input
             [ class "edit"
             , value item.name
@@ -299,8 +298,21 @@ viewControlsClear cnt =
         , hidden (cnt == 0)
         , onClick DeleteAll
         ]
-        [ text ("Clear all (" ++ toString cnt ++ ")")
-        ]
+        [ text ("Clear all (" ++ toString cnt ++ ")") ]
+
+viewResult : List Item -> Float -> Html Msg
+viewResult items rate =
+    let 
+        ta = calcTotalAmount items rate
+    in 
+        footer
+            [ class "total-ammount"
+            , hidden (ta == 0)
+            ]
+            [ text ("USD total ammount: " ++ toString (toFloat (round (ta * 10000)) / 10000)) ]
+
+calcTotalAmount : List Item -> Float -> Float
+calcTotalAmount items rate = (List.sum (List.map (\i -> i.price) items)) * rate
 
 infoFooter : Html msg
 infoFooter =

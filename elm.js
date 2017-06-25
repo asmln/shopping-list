@@ -9286,6 +9286,43 @@ var _user$project$Shlist$infoFooter = A2(
 			}
 		}
 	});
+var _user$project$Shlist$calcTotalAmount = F2(
+	function (items, rate) {
+		return _elm_lang$core$List$sum(
+			A2(
+				_elm_lang$core$List$map,
+				function (i) {
+					return i.price;
+				},
+				items)) * rate;
+	});
+var _user$project$Shlist$viewResult = F2(
+	function (items, rate) {
+		var ta = A2(_user$project$Shlist$calcTotalAmount, items, rate);
+		return A2(
+			_elm_lang$html$Html$footer,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('total-ammount'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$hidden(
+						_elm_lang$core$Native_Utils.eq(ta, 0)),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'USD total ammount: ',
+						_elm_lang$core$Basics$toString(
+							_elm_lang$core$Basics$toFloat(
+								_elm_lang$core$Basics$round(ta * 10000)) / 10000))),
+				_1: {ctor: '[]'}
+			});
+	});
 var _user$project$Shlist$viewControlsCount = function (cnt) {
 	var item_ = _elm_lang$core$Native_Utils.eq(cnt, 1) ? ' item' : ' items';
 	return A2(
@@ -9349,25 +9386,15 @@ var _user$project$Shlist$replace = F3(
 			to,
 			A2(_elm_lang$core$String$split, from, str));
 	});
-var _user$project$Shlist$calcTotalAmount = function (model) {
-	return _elm_lang$core$List$sum(
-		A2(
-			_elm_lang$core$List$map,
-			function (i) {
-				return i.price;
-			},
-			model.items)) * model.xchangeRate;
-};
-var _user$project$Shlist$newItem = F2(
-	function (id, name) {
-		return {id: id, name: name, price: 0, editing: false};
+var _user$project$Shlist$newItem = F3(
+	function (id, name, price) {
+		return {id: id, name: name, price: price, editing: false};
 	});
 var _user$project$Shlist$originalModel = {
 	uid: 0,
 	items: {ctor: '[]'},
 	itemName: '',
-	totalAmmount: 0,
-	xchangeName: 'USDRUB',
+	xchangeName: 'RUBUSD',
 	xchangeUrl: 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20csv%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fd%2Fquotes.csv%3Fe%3D.csv%26f%3Dc4l1%26s%3D${xName}%3DX%22%3B&format=json&diagnostics=true&callback=',
 	xchangeRate: 0
 };
@@ -9381,15 +9408,14 @@ var _user$project$Shlist$setStorage = _elm_lang$core$Native_Platform.outgoingPor
 					return {id: v.id, name: v.name, price: v.price, editing: v.editing};
 				}),
 			itemName: v.itemName,
-			totalAmmount: v.totalAmmount,
 			xchangeName: v.xchangeName,
 			xchangeUrl: v.xchangeUrl,
 			xchangeRate: v.xchangeRate
 		};
 	});
-var _user$project$Shlist$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {uid: a, items: b, itemName: c, totalAmmount: d, xchangeName: e, xchangeUrl: f, xchangeRate: g};
+var _user$project$Shlist$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {uid: a, items: b, itemName: c, xchangeName: d, xchangeUrl: e, xchangeRate: f};
 	});
 var _user$project$Shlist$Item = F4(
 	function (a, b, c, d) {
@@ -9488,6 +9514,32 @@ var _user$project$Shlist$EditingItem = F2(
 		return {ctor: 'EditingItem', _0: a, _1: b};
 	});
 var _user$project$Shlist$viewItem = function (item) {
+	var originPriceArr = {
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('price'),
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onInput(
+				_user$project$Shlist$Buy(item.id)),
+			_1: {ctor: '[]'}
+		}
+	};
+	var priceArr = _elm_lang$core$Native_Utils.eq(item.price, 0) ? A2(
+		_elm_lang$core$Basics_ops['++'],
+		originPriceArr,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$placeholder('RUB'),
+			_1: {ctor: '[]'}
+		}) : A2(
+		_elm_lang$core$Basics_ops['++'],
+		originPriceArr,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$value(
+				_elm_lang$core$Basics$toString(item.price)),
+			_1: {ctor: '[]'}
+		});
 	return A2(
 		_elm_lang$html$Html$li,
 		{
@@ -9521,20 +9573,7 @@ var _user$project$Shlist$viewItem = function (item) {
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$input,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('price'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$placeholder(' RUB'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(
-										_user$project$Shlist$Buy(item.id)),
-									_1: {ctor: '[]'}
-								}
-							}
-						},
+						priceArr,
 						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
@@ -9728,7 +9767,11 @@ var _user$project$Shlist$view = function (model) {
 						_1: {
 							ctor: '::',
 							_0: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Shlist$viewControls, model.items),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$html$Html_Lazy$lazy2, _user$project$Shlist$viewResult, model.items, model.xchangeRate),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				}),
@@ -9762,7 +9805,7 @@ var _user$project$Shlist$update = F2(
 								model.items,
 								{
 									ctor: '::',
-									_0: A2(_user$project$Shlist$newItem, model.uid, model.itemName),
+									_0: A3(_user$project$Shlist$newItem, model.uid, model.itemName, 0),
 									_1: {ctor: '[]'}
 								})
 						}),
@@ -9828,8 +9871,7 @@ var _user$project$Shlist$update = F2(
 								function (i) {
 									return !_elm_lang$core$Native_Utils.eq(i.id, _p0._0);
 								},
-								model.items),
-							totalAmmount: _user$project$Shlist$calcTotalAmount(model)
+								model.items)
 						}),
 					{ctor: '[]'});
 			case 'DeleteAll':
@@ -9838,8 +9880,7 @@ var _user$project$Shlist$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							items: {ctor: '[]'},
-							totalAmmount: 0
+							items: {ctor: '[]'}
 						}),
 					{ctor: '[]'});
 			case 'Buy':
@@ -9858,8 +9899,7 @@ var _user$project$Shlist$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							items: A2(_elm_lang$core$List$map, updateItem, model.items),
-							totalAmmount: _user$project$Shlist$calcTotalAmount(model)
+							items: A2(_elm_lang$core$List$map, updateItem, model.items)
 						}),
 					{ctor: '[]'});
 			default:
@@ -9928,31 +9968,26 @@ var _user$project$Shlist$main = _elm_lang$html$Html$programWithFlags(
 								function (items) {
 									return A2(
 										_elm_lang$core$Json_Decode$andThen,
-										function (totalAmmount) {
+										function (uid) {
 											return A2(
 												_elm_lang$core$Json_Decode$andThen,
-												function (uid) {
+												function (xchangeName) {
 													return A2(
 														_elm_lang$core$Json_Decode$andThen,
-														function (xchangeName) {
+														function (xchangeRate) {
 															return A2(
 																_elm_lang$core$Json_Decode$andThen,
-																function (xchangeRate) {
-																	return A2(
-																		_elm_lang$core$Json_Decode$andThen,
-																		function (xchangeUrl) {
-																			return _elm_lang$core$Json_Decode$succeed(
-																				{itemName: itemName, items: items, totalAmmount: totalAmmount, uid: uid, xchangeName: xchangeName, xchangeRate: xchangeRate, xchangeUrl: xchangeUrl});
-																		},
-																		A2(_elm_lang$core$Json_Decode$field, 'xchangeUrl', _elm_lang$core$Json_Decode$string));
+																function (xchangeUrl) {
+																	return _elm_lang$core$Json_Decode$succeed(
+																		{itemName: itemName, items: items, uid: uid, xchangeName: xchangeName, xchangeRate: xchangeRate, xchangeUrl: xchangeUrl});
 																},
-																A2(_elm_lang$core$Json_Decode$field, 'xchangeRate', _elm_lang$core$Json_Decode$float));
+																A2(_elm_lang$core$Json_Decode$field, 'xchangeUrl', _elm_lang$core$Json_Decode$string));
 														},
-														A2(_elm_lang$core$Json_Decode$field, 'xchangeName', _elm_lang$core$Json_Decode$string));
+														A2(_elm_lang$core$Json_Decode$field, 'xchangeRate', _elm_lang$core$Json_Decode$float));
 												},
-												A2(_elm_lang$core$Json_Decode$field, 'uid', _elm_lang$core$Json_Decode$int));
+												A2(_elm_lang$core$Json_Decode$field, 'xchangeName', _elm_lang$core$Json_Decode$string));
 										},
-										A2(_elm_lang$core$Json_Decode$field, 'totalAmmount', _elm_lang$core$Json_Decode$float));
+										A2(_elm_lang$core$Json_Decode$field, 'uid', _elm_lang$core$Json_Decode$int));
 								},
 								A2(
 									_elm_lang$core$Json_Decode$field,
