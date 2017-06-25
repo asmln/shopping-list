@@ -12,21 +12,21 @@ import Html exposing (..)
 import String
 import Task
 
---main : Program (Maybe Model) Model Msg
---main =
---    Html.programWithFlags
---        { init = init
---        , view = view
---        , update = updateWithStorage
---        , subscriptions = \_ -> Sub.none
---        }
+main : Program (Maybe Model) Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { init = init
         , view = view
         , update = updateWithStorage
         , subscriptions = \_ -> Sub.none
         }
+--main =
+--    Html.program
+--        { init = init
+--        , view = view
+--        , update = updateWithStorage
+--        , subscriptions = \_ -> Sub.none
+--        }
 
 
 port setStorage : Model -> Cmd msg
@@ -80,12 +80,12 @@ newItem id name =
     , editing = False
     }
 
---init : Maybe Model -> ( Model, Cmd Msg )
---init savedModel =
---    (Maybe.withDefault originalModel savedModel, getXchangeRate originalModel.xchangeName originalModel.xchangeUrl)
-init : ( Model, Cmd Msg )
-init =
-    (originalModel, getXchangeRate originalModel.xchangeName originalModel.xchangeUrl)
+init : Maybe Model -> ( Model, Cmd Msg )
+init savedModel =
+    (Maybe.withDefault originalModel savedModel, getXchangeRate originalModel.xchangeName originalModel.xchangeUrl)
+--init : ( Model, Cmd Msg )
+--init =
+--    (originalModel, getXchangeRate originalModel.xchangeName originalModel.xchangeUrl)
 
 
 
@@ -255,7 +255,7 @@ viewItem item =
             [ class "view" ]
             [ input
                 [ class "price"
-                , onInput (Buy item.id)
+                , placeholder "RUB", onInput (Buy item.id)
                 ]
                 []
             , label
