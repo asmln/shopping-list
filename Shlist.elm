@@ -323,4 +323,8 @@ infoFooter =
             , a [ href "https://github.com/asmln" ] [ text "Anatoly Samoylenko" ]
             ]
         , p [] [ text "My first Elm project" ]
+        , p []
+            [ text "Inspired by "
+            , a [ href "https://github.com/evancz" ] [ text "Evan Czaplicki" ]
+            ]
         ]
