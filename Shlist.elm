@@ -119,11 +119,11 @@ update msg model =
 
     Delete id ->
         { model | items = List.filter (\i -> i.id /= id) model.items 
-                , totalAmount = calcTotalAmount model } ! []
+                , totalAmmount = calcTotalAmount model } ! []
 
     DeleteAll ->
         { model | items = [] 
-                , totalAmount = 0} ! [] -- send recalculate event
+                , totalAmmount = 0} ! [] -- send recalculate event
         
     Buy id priceStr ->
         let
@@ -134,7 +134,7 @@ update msg model =
                     i
         in
                 { model | items = List.map updateItem model.items 
-                        , totalAmount = calcTotalAmount model} ! []
+                        , totalAmmount = calcTotalAmount model} ! []
   
     XchRate (Ok xRateStr) -> 
         let n = Result.withDefault 0 (String.toFloat xRateStr) 
