@@ -195,7 +195,7 @@ viewInput item =
             , autofocus True
             , value item
             , name "newItem"
-            , onInput UpdateItem
+            , onInput UpdateItemName
             , onEnter Add
             ]
             []
