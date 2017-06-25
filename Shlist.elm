@@ -24,7 +24,7 @@ type alias Model =
 
 init : (Model, Cmd Msg)
 init =
-  (Model "USDRUB" "https://query.yahooapis.com/v1/public/yql?q=select * from csv where url='http://finance.yahoo.com/d/quotes.csv?e=.csv&f=nl1d1t1&s=${xName}=X';&format=json&callback=" 0, Cmd.none)
+  (Model "USDRUB" "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20csv%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fd%2Fquotes.csv%3Fe%3D.csv%26f%3Dc4l1%26s%3D${xName}%3DX%22%3B&format=json&diagnostics=true&callback=" 0, Cmd.none)
 
 -- UPDATE
 
@@ -38,8 +38,10 @@ update msg model =
     ShowXchRate ->
       (model, getXchangeRate model.xchangeName model.xchangeUrl)
 
-    XchRate (Ok xRate) ->
-      (Model model.xchangeName model.xchangeUrl xRate, Cmd.none)
+    XchRate (Ok xRateStr) -> 
+        let n = Result.withDefault 0 (String.toFloat xRateStr) 
+        in
+            (Model model.xchangeName model.xchangeUrl n, Cmd.none)
 
     XchRate (Err _) ->
       (model, Cmd.none)
@@ -55,10 +57,13 @@ getXchangeRate xName xUrl =
   in
     Http.send XchRate request
 
-decodeX : Decode.Decoder Float
-decodeX = case (parseFloat (Decode.at ["query", "results", "row", "col1"] Decode.string)) of
-    Just n -> n
-    Nothing -> 0
+replace : String -> String -> String -> String
+replace from to str =
+    String.split from str
+        |> String.join to
+
+decodeX : Decode.Decoder String
+decodeX = Decode.at ["query", "results", "row", "col1"] Decode.string
 
 -- SUBSCRIPTIONS
 
@@ -67,7 +72,6 @@ subscriptions model =
     Sub.none
 
 -- VIEW
-
 
 view : Model -> Html Msg
 view model =
