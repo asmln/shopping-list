@@ -124,11 +124,11 @@ update msg model =
         { model | items = [] 
                 , totalAmount = 0} ! [] -- send recalculate event
         
-    Buy id price ->
+    Buy id priceStr ->
         let
             updateItem i =
                 if i.id == id then
-                    { i | price = price }
+                    { i | price = Result.withDefault 0 (String.toFloat priceStr) }
                 else
                     i
         in
@@ -211,16 +211,16 @@ onEnter msg =
     in
         on "keydown" (Json.andThen isEnter keyCode)
         
-viewItems : List Entry -> Html Msg
+viewItems : List Item -> Html Msg
 viewItems items =
     section
         [ class "main" ]
         [ Keyed.ul [ class "item-list" ] <|
-            List.map viewKeyedEntry items
+            List.map viewKeyedItem items
         ]
             
-viewKeyedEntry : Item -> ( String, Html Msg )
-viewKeyedEntry item =
+viewKeyedItem : Item -> ( String, Html Msg )
+viewKeyedItem item =
     ( toString item.id, lazy viewItem item )
     
 viewItem : Item -> Html Msg
