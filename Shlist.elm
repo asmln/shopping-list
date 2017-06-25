@@ -20,6 +20,19 @@ main =
         , subscriptions = \_ -> Sub.none
         }
 
+port setStorage : Model -> Cmd msg
+
+-- This function adds the setStorage command for every step of the update function.
+updateWithStorage : Msg -> Model -> ( Model, Cmd Msg )
+updateWithStorage msg model =
+    let
+        ( newModel, cmds ) =
+            update msg model
+    in
+        ( newModel
+        , Cmd.batch [ setStorage newModel, cmds ]
+        )
+
 -- MODEL
 
 type alias Model =
