@@ -6,6 +6,14 @@ import Html.Events exposing (..)
 import Http
 import Json.Decode as Decode
 
+main =
+    Html.program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
+
 -- MODEL
 
 type alias Model =
@@ -51,11 +59,19 @@ decodeX : Decode.Decoder String
 decodeX =
   Decode.at ["query", "results", "row", "col1"] Decode.string
 
+-- SUBSCRIPTIONS
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
 -- VIEW
+
 
 view : Model -> Html Msg
 view model =
-  div []
-    [ h2 [] [text model.xchangeName]
-    , button [ onClick ShowXchRate ] [ text "Test!" ]
-    ]
+    div []
+        [ h2 [] [ text model.xchangeName ]
+        , h3 [] [ text model.xchangeRate ]
+        , button [ onClick ShowXchRate ] [ text "Test!" ]
+        ]
