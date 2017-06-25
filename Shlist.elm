@@ -256,7 +256,7 @@ viewItem item =
             []
         ]
         
-viewControls : String -> List Item -> Html Msg
+viewControls : List Item -> Html Msg
 viewControls items =
     footer
         [ class "footer"
