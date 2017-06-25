@@ -12,14 +12,22 @@ import Html exposing (..)
 import String
 import Task
 
-main : Program (Maybe Model) Model Msg
+--main : Program (Maybe Model) Model Msg
+--main =
+--    Html.programWithFlags
+--        { init = init
+--        , view = view
+--        , update = updateWithStorage
+--        , subscriptions = \_ -> Sub.none
+--        }
 main =
-    Html.programWithFlags
+    Html.program
         { init = init
         , view = view
         , update = updateWithStorage
         , subscriptions = \_ -> Sub.none
         }
+
 
 port setStorage : Model -> Cmd msg
 
@@ -40,8 +48,7 @@ type alias Model =
     { uid : Int
     , items : List Item
     , itemName : String
-    , totalAmmount : Float
-    
+    , totalAmmount : Float    
     , xchangeName : String
     , xchangeUrl : String
     , xchangeRate : Float
@@ -73,9 +80,13 @@ newItem id name =
     , editing = False
     }
 
-init : Maybe Model -> ( Model, Cmd Msg )
-init savedModel =
-    (Maybe.withDefault originalModel savedModel, getXchangeRate originalModel.xchangeName originalModel.xchangeUrl)
+--init : Maybe Model -> ( Model, Cmd Msg )
+--init savedModel =
+--    (Maybe.withDefault originalModel savedModel, getXchangeRate originalModel.xchangeName originalModel.xchangeUrl)
+init : ( Model, Cmd Msg )
+init =
+    (originalModel, getXchangeRate originalModel.xchangeName originalModel.xchangeUrl)
+
 
 
 -- UPDATE
@@ -137,7 +148,7 @@ update msg model =
 
     DeleteAll ->
         { model | items = [] 
-                , totalAmmount = 0} ! [] -- send recalculate event
+                , totalAmmount = 0} ! []
         
     Buy id priceStr ->
         let
@@ -261,7 +272,7 @@ viewItem item =
         , input
             [ class "edit"
             , value item.name
-            , name "name"
+            , name "title"
             , id ("item-" ++ toString item.id)
             , onInput (UpdateItem item.id)
             , onBlur (EditingItem item.id False)
