@@ -20,14 +20,6 @@ main =
         , update = updateWithStorage
         , subscriptions = \_ -> Sub.none
         }
---main =
---    Html.program
---        { init = init
---        , view = view
---        , update = updateWithStorage
---        , subscriptions = \_ -> Sub.none
---        }
-
 
 port setStorage : Model -> Cmd msg
 
@@ -83,10 +75,6 @@ newItem id name =
 init : Maybe Model -> ( Model, Cmd Msg )
 init savedModel =
     (Maybe.withDefault originalModel savedModel, getXchangeRate originalModel.xchangeName originalModel.xchangeUrl)
---init : ( Model, Cmd Msg )
---init =
---    (originalModel, getXchangeRate originalModel.xchangeName originalModel.xchangeUrl)
-
 
 
 -- UPDATE
