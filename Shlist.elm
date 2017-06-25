@@ -51,7 +51,7 @@ originalModel =
     , xchangeRate = 0
     }
     
-newItem : String -> Int -> Item
+newItem : Int -> String -> Item
 newItem id name =
     { id = id
     , name = name
