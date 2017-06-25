@@ -197,9 +197,7 @@ decodeX = Decode.at ["query", "results", "row", "col1"] Decode.string
 view : Model -> Html Msg
 view model =
     div
-        [ class "shlist-wrapper"
-        , style [ ( "visibility", "hidden" ) ]
-        ]
+        [ class "shlist-wrapper" ]
         [ section
             [ class "shlist" ]
             [ lazy viewInput model.itemName
