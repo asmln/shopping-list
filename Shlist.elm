@@ -74,6 +74,7 @@ type Msg
     | Add
     | Delete Int
     | DeleteAll
+    | Buy Int String
     | XchRate (Result Http.Error String)
 
 update : Msg -> Model -> (Model, Cmd Msg)
