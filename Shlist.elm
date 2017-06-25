@@ -207,34 +207,11 @@ onEnter msg =
         
 viewItems : List Entry -> Html Msg
 viewItems items =
-    let
-        isVisible todo =
-            case visibility of
-                "Completed" ->
-                    todo.completed
-
-                "Active" ->
-                    not todo.completed
-
-                _ ->
-                    True
-
-        allCompleted =
-            List.all .completed entries
-
-        cssVisibility =
-            if List.isEmpty entries then
-                "hidden"
-            else
-                "visible"
-    in
-        section
-            [ class "main"
-            , style [ ( "visibility", cssVisibility ) ]
-            ]
-            [ Keyed.ul [ class "item-list" ] <|
-                List.map viewKeyedEntry items
-            ]
+    section
+        [ class "main" ]
+        [ Keyed.ul [ class "item-list" ] <|
+            List.map viewKeyedEntry items
+        ]
             
 viewKeyedEntry : Item -> ( String, Html Msg )
 viewKeyedEntry item =
@@ -262,7 +239,7 @@ viewItem item =
             ]
         , input
             [ class "edit"
-            , value todo.name
+            , value item.name
             , name "name"
             , id ("item-" ++ toString item.id)
             , onInput (UpdateItem item.id)
@@ -316,14 +293,4 @@ infoFooter =
             , a [ href "https://github.com/asmln" ] [ text "Anatoly Samoylenko" ]
             ]
         , p [] [ text "My first Elm project" ]
-        ]
-
-
---------------
-view : Model -> Html Msg
-view model =
-    div []
-        [ h2 [] [ text model.xchangeName ]
-        , h3 [] [ text (toString model.xchangeRate) ]
-        , button [ onClick ShowXchRate ] [ text "Test!" ]
         ]
